@@ -1,8 +1,11 @@
 package com.example.laboratorio5
 
+import android.app.Activity
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -10,13 +13,13 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
+    var products: ArrayList<Product> = ArrayList()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val products: ArrayList<Product> = ArrayList()
-
-        products.add(Product(1, "Cerveza"))
+        //products.add(Product(1, "Cerveza"))
 
         showProducts(products)
 
@@ -53,13 +56,49 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
+     * Metodo que determina cada accion del menuOption
+     */
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+
+        when (item?.itemId){
+
+            R.id.nuevo_producto -> {
+                val intent = Intent(this, NewProduct::class.java).putExtra("Products", products)
+                startActivityForResult(intent, 1)
+            }
+
+            R.id.reiniciar_lista-> {
+                products.clear()
+                showProducts(products)
+            }
+
+            R.id.inventario_actual -> {
+
+            }
+
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    /**
      * Metodo que recive la lista de productos y los muestra en el Recycler View
      */
-    fun showProducts(products: ArrayList<Product>){
+    private fun showProducts(products: ArrayList<Product>){
 
         recyclerViewProducts.layoutManager = LinearLayoutManager(this)
         recyclerViewProducts.adapter = ProductAdapter(products)
 
+    }
+
+    /**
+     * Metodo que recive la informacion de la pestaña nuevo producto
+     */
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK){
+            products = data!!.getSerializableExtra("Products") as ArrayList<Product>
+            showProducts(products)
+        }
     }
 
 }

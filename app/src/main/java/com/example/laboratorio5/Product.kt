@@ -1,7 +1,7 @@
 package com.example.laboratorio5
 
-data class Product(
-    val codigo: Int,
-    val nombre: String,
-    var cant: Int = 0
-)
+import java.io.Serializable
+
+data class Product (val codigo: Int,
+                    val nombre: String,
+                    var cant: Int = 0): Serializable
