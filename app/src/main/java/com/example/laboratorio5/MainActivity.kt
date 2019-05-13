@@ -6,9 +6,11 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.zxing.integration.android.IntentIntegrator
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -19,10 +21,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //products.add(Product(1, "Cerveza"))
-
         showProducts(products)
 
+        addProductQR.setOnClickListener {
+            val scanner = IntentIntegrator(this)
+            scanner.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
+            scanner.setBeepEnabled(false)
+            scanner.initiateScan()
+        }
 
         /**
          * En caso se deslice el cardView a alguno de los lados eliminara el elemento
@@ -97,6 +103,23 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 1 && resultCode == Activity.RESULT_OK){
             products = data!!.getSerializableExtra("Products") as ArrayList<Product>
+            showProducts(products)
+        }
+        if (resultCode == Activity.RESULT_OK) {
+            val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
+            if (result != null) {
+                if (result.contents == null) {
+                    Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show()
+                } else {
+                    products.forEach {
+                        if (it.codigo.toString().equals(result.contents.toString())){
+                            it.cant += 1
+                        }
+                    }
+                }
+            } else {
+                super.onActivityResult(requestCode, resultCode, data)
+            }
             showProducts(products)
         }
     }

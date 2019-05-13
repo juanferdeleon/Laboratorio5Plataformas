@@ -21,19 +21,34 @@ class NewProduct : AppCompatActivity() {
 
         val addProduct =findViewById<Button>(R.id.saveProduct)
 
+        //Save Button
         addProduct.setOnClickListener {
 
+            var exists: Boolean = false
+
             val productName: String = findViewById<TextView>(R.id.productName).text.toString()
-            val productCode: Int = findViewById<TextView>(R.id.productCode).text.toString().toInt()
-            val newProduct = Product(productCode, productName)
+            val productCode: String = findViewById<TextView>(R.id.productCode).text.toString()
 
-            products.add(newProduct)
+            if (productName == "" && productCode == ""){
+                Toast.makeText(this, "ERROR: Texto vacio", Toast.LENGTH_SHORT).show()
+            } else {
+                products.forEach {
+                    if (it.codigo == productCode.toInt()){
+                        Toast.makeText(this, "ERROR: Codigo ya existe", Toast.LENGTH_SHORT).show()
+                        exists = true
+                    }
+                }
 
-            Toast.makeText(this, "Se ha agregado con exito.", Toast.LENGTH_SHORT).show()
+                if (!exists){
+                    val newProduct = Product(productCode.toInt(), productName)
+                    products.add(newProduct)
+                    Toast.makeText(this, "Se ha agregado con exito.", Toast.LENGTH_SHORT).show()
 
-            val intent = Intent(this, MainActivity::class.java).putExtra("Products", products)
-            setResult(Activity.RESULT_OK, intent)
-            finish()
+                    val intent = Intent(this, MainActivity::class.java).putExtra("Products", products)
+                    setResult(Activity.RESULT_OK, intent)
+                    finish()
+                }
+            }
 
         }
 
